@@ -45,7 +45,7 @@ pub mod binance_client {
             client
         }
 
-        pub async fn send_limit_order(&self, symbol: &str, side: &str, time_in_force: &str, quantity: &str, price: &str) -> Value {
+        pub async fn send_limit_order(&self, symbol: &str, side: &str, time_in_force: &str, quantity: f64, price: f64) -> Value {
             let ts = Binance::get_timestamp();
             let params = format!(
                 "symbol={}&side={}&type=LIMIT&timeInForce={}&quantity={}&price={}&timestamp={}",

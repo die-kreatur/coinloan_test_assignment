@@ -65,5 +65,15 @@ pub mod binance_client {
 
             data
         }
+
+        pub async fn get_listen_key(&self) -> Value {
+            const LISTEN_KEY_URL: &str = "https://api.binance.com/api/v1/userDataStream";
+
+            let client = self.get_client();
+            let response = client.post(LISTEN_KEY_URL).send().await.unwrap();
+            let listen_key: Value = response.json().await.unwrap();
+
+            listen_key
+        }
     }
 }

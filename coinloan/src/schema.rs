@@ -6,5 +6,6 @@ table! {
         time_in_force -> Varchar,
         quantity -> Numeric,
         price -> Numeric,
+        is_comleted -> Bool,
     }
 }

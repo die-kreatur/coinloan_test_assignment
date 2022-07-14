@@ -18,8 +18,8 @@ extern crate diesel;
 async fn main() {
 	dotenv::dotenv().ok();
 
-	use binance_client::binance_client::Binance;
-	use get_prices::get_prices::fetch_tickers;
+	use crate::binance_client::Binance;
+	use crate::get_prices::fetch_tickers;
 
 	let acc = Binance {
 		api_key: env::var("KEY").unwrap(),

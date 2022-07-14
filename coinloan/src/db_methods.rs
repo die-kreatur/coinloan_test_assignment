@@ -12,7 +12,7 @@ pub fn establish_connection() -> PgConnection {
     let database_url = env::var("DATABASE_URL")
         .expect("DATABASE_URL is not provided");
     PgConnection::establish(&database_url)
-        .expect(&format!("Error connecting to {}", database_url))
+        .expect("Cannot connect to DB")
 }
 
 pub fn create_order<'a>(conn: &PgConnection, symbol: &'a str, side: &'a str, quantity: &'a BigDecimal, price: &'a BigDecimal) -> Order {
@@ -29,31 +29,34 @@ pub fn create_order<'a>(conn: &PgConnection, symbol: &'a str, side: &'a str, qua
     diesel::insert_into(orders::table)
         .values(&new_order)
         .get_result(conn)
-        .expect("Error saving new post")
+        .expect("Cannot save an order")
 }
 
 pub fn update_order<'a>(connection: &PgConnection, id: i32) {
-    use crate::schema::orders::dsl::{orders, is_comleted};
+    use crate::schema::orders::dsl::{orders, is_completed};
 
     diesel::update(orders.find(id))
-        .set(is_comleted.eq(true))
+        .set(is_completed.eq(true))
         .get_result::<Order>(connection)
-        .expect(&format!("Unable to find post {}", id));
+        .expect("Unable to find requested order");
 }
 
-// TODO: test func
 pub fn delete_order<'a>(connection: &PgConnection, id: i32) {
     use crate::schema::orders::dsl::orders;
 
     diesel::delete(orders.find(id))
         .execute(connection)
-        .expect("Error deleting posts");
+        .expect("Cannot delete order");
 }
 
-// fn main() {
-//     let connection = establish_connection();
-//     // let q = BigDecimal::from_f64(0.1).unwrap();
-//     // let p = BigDecimal::from_f64(50.0).unwrap();
-//     // create_order(&connection, "BTCUSD", "BUY", &q, &p);
-//     update_order(&connection, 1);
-// }
+pub fn list_orders<'a>(connection: &PgConnection) -> Vec<(String, String, BigDecimal, BigDecimal, bool)> {
+    use crate::schema::orders::dsl::{orders, id, symbol, side, quantity, price, is_completed};
+
+    let results = orders.select((symbol, side, quantity, price, is_completed))
+        .order_by(id.desc())
+        .limit(10)
+        .load::<(String, String, BigDecimal, BigDecimal, bool)>(connection)
+        .expect("Cannot get orders from DB");
+
+    results
+}

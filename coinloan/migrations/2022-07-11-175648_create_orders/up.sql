@@ -6,5 +6,5 @@ CREATE TABLE orders (
     time_in_force VARCHAR(3) DEFAULT 'GTC' NOT NULL,
     quantity DECIMAL NOT NULL,
     price DECIMAL NOT NULL,
-    is_comleted BOOLEAN NOT NULL DEFAULT 'f'
+    is_completed BOOLEAN NOT NULL DEFAULT 'f'
 );

@@ -2,10 +2,11 @@ use jsonrpc_core_client::transports::local;
 use jsonrpc_core::futures::{self, future};
 use jsonrpc_core::{IoHandler, Result, BoxFuture};
 use jsonrpc_derive::rpc;
-
+use jsonrpc_http_server::ServerBuilder;
 use bigdecimal::{BigDecimal, FromPrimitive};
 use crate::db_methods::{establish_connection, create_order, list_orders, delete_order};
 
+// TODO: test this module
 
 #[rpc]
 pub trait Rpc {
@@ -40,16 +41,14 @@ impl Rpc for RpcImpl {
    }
 }
 
-// fn main() {
-//     let exec = futures::executor::ThreadPool::new().unwrap();
-//     exec.spawn_ok(run())
-// }
-// async fn run() {
-//    let mut io = IoHandler::new();
-//    io.extend_with(RpcImpl.to_delegate());
+fn start_jsonrpc_server() {
+	let mut io = jsonrpc_core::IoHandler::new();
+	io.extend_with(RpcImpl.to_delegate());
 
-//    let (client, server) = local::connect::<RpcClient, _, _>(io);
-//    let res = client.add(5, 6).await.unwrap();
-//    println!("5 + 6 = {}", res);
-//    server.await.unwrap()
-// }
+    let server = ServerBuilder::new(io)
+		.threads(3)
+		.start_http(&"127.0.0.1:3030".parse().unwrap())
+		.unwrap();
+
+	server.wait();
+}

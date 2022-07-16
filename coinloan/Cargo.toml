@@ -20,4 +20,4 @@ jsonrpc-core = "18.0.0"
 jsonrpc-derive = "18.0.0"
 jsonrpc-core-client = "18.0.0"
 diesel = {version = "1.4.4", features = ["postgres", "numeric"]}
-bigdecimal = "0.1.2"
+bigdecimal = {version = "0.1.2", features = ["serde"]}

@@ -1,8 +1,9 @@
 use super::schema::orders;
 use bigdecimal::BigDecimal;
+use serde::{Serialize, Deserialize};
 
 
-#[derive(Queryable)]
+#[derive(Serialize, Deserialize, Queryable)]
 pub struct Order {
     pub id: i32,
     pub symbol: String,

@@ -49,13 +49,13 @@ pub fn delete_order<'a>(connection: &PgConnection, id: i32) {
         .expect("Cannot delete order");
 }
 
-pub fn list_orders<'a>(connection: &PgConnection) -> Vec<(String, String, BigDecimal, BigDecimal, bool)> {
+pub fn list_orders<'a>(connection: &PgConnection) -> Vec<(i32, String, String, BigDecimal, BigDecimal, bool)> {
     use crate::schema::orders::dsl::{orders, id, symbol, side, quantity, price, is_completed};
 
-    let results = orders.select((symbol, side, quantity, price, is_completed))
+    let results = orders.select((id, symbol, side, quantity, price, is_completed))
         .order_by(id.desc())
         .limit(10)
-        .load::<(String, String, BigDecimal, BigDecimal, bool)>(connection)
+        .load::<(i32, String, String, BigDecimal, BigDecimal, bool)>(connection)
         .expect("Cannot get orders from DB");
 
     results

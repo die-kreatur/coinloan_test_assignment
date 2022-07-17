@@ -1,5 +1,5 @@
 use hmac::{Hmac, Mac, NewMac};
-use reqwest::{header, Client};
+use reqwest::{header, blocking::Client as Client};
 use sha2::Sha256;
 use std::time::{SystemTime, UNIX_EPOCH};
 use serde_json::Value;
@@ -43,11 +43,11 @@ impl Binance {
         client
     }
 
-    pub async fn send_limit_order(&self, symbol: &str, side: &str, time_in_force: &str, quantity: f64, price: f64) -> Value {
+    pub fn send_limit_order(&self, symbol: &str, side: &str, quantity: f64, price: f64) -> Value {
         let ts = Binance::get_timestamp();
         let params = format!(
-            "symbol={}&side={}&type=LIMIT&timeInForce={}&quantity={}&price={}&timestamp={}",
-            symbol, side, time_in_force, quantity, price, ts
+            "symbol={}&side={}&type=LIMIT&timeInForce=GTC&quantity={}&price={}&timestamp={}",
+            symbol, side, quantity, price, ts
         );
         let signature = self.get_signature(&params);
 
@@ -58,19 +58,21 @@ impl Binance {
         );
 
         let client = self.get_client();
-        let response = client.post(request).send().await.unwrap();
-        let data: Value = response.json().await.unwrap();
+        let response = client.post(request).send().unwrap();
+        let data: Value = response.json().unwrap();
 
         data
     }
 
-    pub async fn get_listen_key(&self) -> Value {
-        const LISTEN_KEY_URL: &str = "https://api.binance.com/api/v1/userDataStream";
-
+    pub fn get_listen_key(&self) -> String {
         let client = self.get_client();
-        let response = client.post(LISTEN_KEY_URL).send().await.unwrap();
-        let listen_key: Value = response.json().await.unwrap();
+        let response = client
+            .post("https://api.binance.com/api/v1/userDataStream")
+            .send()
+            .unwrap();
 
-        listen_key
+        let listen_key: Value = response.json().unwrap();
+
+        listen_key["listenKey"].to_string()
     }
 }

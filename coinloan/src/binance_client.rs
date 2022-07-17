@@ -13,7 +13,7 @@ pub struct Binance {
 }
 
 impl Binance {
-    
+    /// создание сигнатуры для подпсии запросов
     fn get_signature(&self, params: &String) -> String {
         let secret_key = &self.api_secret;
         let mut signed_key = Hmac::<Sha256>
@@ -25,11 +25,13 @@ impl Binance {
         signature
     }
 
+    /// получение текущего таймстемпа для сигнатуры
     fn get_timestamp() -> String {
         let ts = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
         ts.as_millis().to_string()
     }
 
+    /// создание клиента, через которого будут отправляться запросы
     pub fn get_client(&self) -> Client {
         let mut headers = header::HeaderMap::new();
         headers.insert(
@@ -45,6 +47,7 @@ impl Binance {
         client
     }
 
+    /// функция для выставления лимитного ордера
     pub fn send_limit_order(&self, symbol: &str, side: &str, quantity: f64, price: f64) -> Value {
         let ts = Binance::get_timestamp();
         let params = format!(
@@ -66,6 +69,7 @@ impl Binance {
         data
     }
 
+    /// получение ключа для подписки на user stream для получения апдейтов ордеров
     fn get_listen_key(&self) -> String {
         let client = self.get_client();
         let response = client
@@ -78,6 +82,7 @@ impl Binance {
         listen_key["listenKey"].to_string()
     }
 
+    /// мониторинг лимитного ордера и проверка, не исполнился ли он полностью
     pub fn is_limit_order_completed(&self) -> bool {
         let listen_key = self.get_listen_key();
         let user_stream = format!("wss://stream.binance.com:9443/ws/{}", listen_key);

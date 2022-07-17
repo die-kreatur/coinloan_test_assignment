@@ -8,6 +8,7 @@ use crate::db_model::Order;
 use diesel::pg::PgConnection;
 
 
+/// функция для отправки нотификации в телеграм канал
 fn send_message_to_tg(msg: String) -> () {
     let token = env::var("TOKEN").unwrap();
     let chat_id = env::var("CHAT_ID").unwrap();
@@ -22,6 +23,13 @@ fn send_message_to_tg(msg: String) -> () {
     client.post(tg_url).send().expect("Unable to send message to telegram");
 }
 
+/// в случае появления нового ордера в БД запускается мониторинг
+/// валютных пар, чтобы отследить, когда ордер можно будет выставлять.
+/// когда значение цены из БД становится больше или равно значения 
+/// соответствующей котировки, выставляется лимитный ордер,
+/// после чего отправляется нотификация в телеграм, запускается мониторинг ордера
+/// и в случае полоного исполнения снова отправляется нотификация в телеграм канал,
+/// а затем статус ордера обновляется в БД.
 pub fn manage_limit_order(conn: &PgConnection, new_order: Order) -> () {
 
     let price = new_order.price.to_f64().unwrap();

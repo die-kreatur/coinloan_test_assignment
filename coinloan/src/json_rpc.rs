@@ -9,13 +9,15 @@ use crate::services::manage_limit_order;
 
 #[rpc]
 pub trait Rpc {
-
+     /// создание нового ордера и его мониторинг
      #[rpc(name = "newOrder")]
      fn add_new_order(&self, symbol: String, side: String, quantity: f64, price: f64) -> JsonRpcResult<()>;
 
+     /// получение списка ордеров из БД
      #[rpc(name = "listOrders")]
      fn list_orders(&self) -> JsonRpcResult<Vec<(i32, String, String, BigDecimal, BigDecimal, bool)>>;
 
+     /// удаление ордера по id из базы данных
      #[rpc(name = "deleteOrder")]
      fn remove_order(&self, id: i32) -> JsonRpcResult<()>;
 }
@@ -43,6 +45,7 @@ impl Rpc for RpcImpl {
      }
 }
 
+/// запуск сервера локально
 pub fn start_jsonrpc_server() {
      let mut io = jsonrpc_core::IoHandler::new();
      io.extend_with(RpcImpl.to_delegate());

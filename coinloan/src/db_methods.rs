@@ -6,6 +6,7 @@ use std::env;
 use crate::db_model::{NewOrder, Order};
 
 
+/// установление соединения с базой данных
 pub fn establish_connection() -> PgConnection {
     dotenv::dotenv().ok();
 
@@ -15,6 +16,7 @@ pub fn establish_connection() -> PgConnection {
         .expect("Cannot connect to DB")
 }
 
+/// сохранение параметров для ордера в базу данных
 pub fn create_order<'a>(conn: &PgConnection, symbol: &'a str, side: &'a str, quantity: &'a BigDecimal, price: &'a BigDecimal) -> Order {
     use crate::schema::orders;
 
@@ -32,6 +34,7 @@ pub fn create_order<'a>(conn: &PgConnection, symbol: &'a str, side: &'a str, qua
         .expect("Cannot save an order")
 }
 
+/// обновление статуса ордера на полностью исполненный
 pub fn update_order<'a>(connection: &PgConnection, id: i32) {
     use crate::schema::orders::dsl::{orders, is_completed};
 
@@ -41,6 +44,7 @@ pub fn update_order<'a>(connection: &PgConnection, id: i32) {
         .expect("Unable to find requested order");
 }
 
+/// удаление ордера из базы данных (не отменяет исполнение на бирже)
 pub fn delete_order<'a>(connection: &PgConnection, id: i32) {
     use crate::schema::orders::dsl::orders;
 
@@ -49,6 +53,7 @@ pub fn delete_order<'a>(connection: &PgConnection, id: i32) {
         .expect("Cannot delete order");
 }
 
+/// вывод последних десяти добавленных ордеров
 pub fn list_orders<'a>(connection: &PgConnection) -> Vec<(i32, String, String, BigDecimal, BigDecimal, bool)> {
     use crate::schema::orders::dsl::{orders, id, symbol, side, quantity, price, is_completed};
 

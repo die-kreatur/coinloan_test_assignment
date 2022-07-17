@@ -37,7 +37,7 @@ pub fn manage_limit_order(conn: &PgConnection, new_order: Order) -> () {
     acc.send_limit_order(&new_order.symbol, &new_order.side, quantity, max_price);
 
     let tg_msg: String = format!(
-        "Your order was send just now! Symbol: {}, price: {}, side: {}", 
+        "Your order was sent just now! Symbol: {}, price: {}, side: {}", 
         &new_order.symbol, price, &new_order.side
     );
     send_message_to_tg(tg_msg);

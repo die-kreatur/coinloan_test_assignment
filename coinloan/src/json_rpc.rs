@@ -44,13 +44,13 @@ impl Rpc for RpcImpl {
 }
 
 pub fn start_jsonrpc_server() {
-	let mut io = jsonrpc_core::IoHandler::new();
-	io.extend_with(RpcImpl.to_delegate());
+     let mut io = jsonrpc_core::IoHandler::new();
+     io.extend_with(RpcImpl.to_delegate());
 
-    let server = ServerBuilder::new(io)
-		.threads(3)
-		.start_http(&"127.0.0.1:3030".parse().unwrap())
-		.unwrap();
+     let server = ServerBuilder::new(io)
+          .threads(3)
+          .start_http(&"127.0.0.1:3030".parse().unwrap())
+          .unwrap();
 
-	server.wait();
+     server.wait();
 }

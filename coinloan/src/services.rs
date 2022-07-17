@@ -30,8 +30,8 @@ pub fn manage_limit_order(conn: &PgConnection, new_order: Order) -> () {
     let max_price = fetch_tickers(&new_order.symbol, price);
 
     let acc: Binance = Binance {
-		api_key: env::var("KEY").unwrap(),
-		api_secret: env::var("SECRET").unwrap()
+        api_key: env::var("KEY").unwrap(),
+        api_secret: env::var("SECRET").unwrap()
 	};
 
     acc.send_limit_order(&new_order.symbol, &new_order.side, quantity, max_price);
